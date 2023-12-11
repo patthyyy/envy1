@@ -34,8 +34,7 @@ if st.button('Submit'):
         messages=messages_so_far
     )
     # Show the response from the AI in a box
-    st.markdown('**AI response:**')
-    st.text(response)
+    # st.markdown('**AI response:**')
     # suggestion_dictionary = response.choices[0].message.content
 
 
@@ -45,3 +44,9 @@ if st.button('Submit'):
     # suggestion_df = pd.DataFrame.from_dict(sd)
     # print(suggestion_df)
     # st.table(suggestion_df)
+     # Extract AI's reply from the response
+    ai_reply = response['choices'][0]['message']['content']
+    
+    # Show the response from the AI in a box
+    st.markdown('**AI response:**')
+    st.write(ai_reply)
