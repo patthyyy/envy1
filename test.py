@@ -1,44 +1,77 @@
 import streamlit as st
 import openai
+from ml_backend import ml_backend
 
-# ใส่ API key ของคุณที่ได้จาก OpenAI
-openai.api_key = "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"
+class ml_backend:
+        
+    openai.api_key = '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'
 
-# ข้อความเริ่มต้นที่จะให้กับผู้ใช้
-prompt = """Imagine yourself as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in a JSON array with one suggestion per line. Each suggestion should include the following fields:
-- "Symptoms"
-- "Recommended Medication"
-- "Medication Class"
-- "Administration Method"
-Wait for the user to initiate the conversation before providing any information."""
+    def generate_email(self, userPrompt ="Write me a professionally sounding email", start="Dear"):
+        """Returns a generated an email using GPT3 with a certain prompt and starting sentence"""
 
-# สร้างหน้าต่าง Streamlit
-st.title('Medicine Doctor')
-st.markdown('Input a patient\'s symptoms that you want to treat. \n\
-            The AI will give you suggestions on how to treat it.')
+        response = openai.Completion.create(
+        engine="davinci",
+        prompt=userPrompt + "\n\n" + start,
+        temperature=0.71,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0.36,
+        presence_penalty=0.75
+        )
+        return response.get("choices")[0]['text']
 
-# กล่องใส่ข้อความของผู้ใช้
-user_input = st.text_area("Enter some symptoms to treat:", "Your text here")
+    def replace_spaces_with_pluses(self, sample):
+        """Returns a string with each space being replaced with a plus so the email hyperlink can be formatted properly"""
+        changed = list(sample)
+        for i, c in enumerate(changed):
+            if(c == ' ' or c =='  ' or c =='   ' or c=='\n' or c=='\n\n'):
+                changed[i] = '+'
+        return ''.join(changed)
 
-# ปุ่ม Submit
-if st.button('Submit'):
-    # สร้างโครงสร้างข้อความสำหรับ OpenAI API
-    messages = [
-        {"role": "system", "content": prompt},
-        {'role': 'user', 'content': user_input},
-    ]
+st.title("Interactive Email Generator App")
+st.text("by Alex Zavalny")
 
-    # ใช้ OpenAI API เพื่อรับการตอบกลับ
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=0.7,
-        max_tokens=150
-    )
+st.markdown(""" 
 
-    # นำข้อความตอบกลับจาก OpenAI
-    ai_reply = response['choices'][0]['message']['content']
+# About
+ 
+## Play around with the sliders and text fields to generate your very own emails! 
+## At the end, you can automatically send your email to a recipient via Gmail  
 
-    # แสดงผลลัพธ์จาก OpenAI
-    st.markdown('**AI Response:**')
-    st.write(ai_reply)
+## Business Benefits and Usecases:
+* Time saved writing medium-long sized emails
+* Mental Energy is conserved
+* Anxiety of writing a **professional sounding** email (or email with any writing style) is removed as the GPT3 Language model used is trained from a variety of many different internet sources
+
+""")
+
+st.markdown("# Generate Email")
+
+backend = ml_backend()
+
+with st.form(key="form"):
+    prompt = st.text_input("Describe the Kind of Email you want to be written.")
+    st.text(f"(Example: Write me a professional sounding email to my boss)")
+
+    start = st.text_input("Begin writing the first few or several words of your email:")
+
+    slider = st.slider("How many characters do you want your email to be? ", min_value=64, max_value=750)
+    st.text("(A typical email is usually 100-500 characters)")
+
+    submit_button = st.form_submit_button(label='Generate Email')
+
+    if submit_button:
+        with st.spinner("Generating Email..."):
+            output = backend.generate_email(prompt, start)
+        st.markdown("# Email Output:")
+        st.subheader(start + output)
+
+        st.markdown("____")
+        st.markdown("# Send Your Email")
+        st.subheader("You can press the Generate Email Button again if you're unhappy with the model's output")
+        
+        st.subheader("Otherwise:")
+        st.text(output)
+        url = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=&body=" + backend.replace_spaces_with_pluses(start + output)
+
+        st.markdown("[Click me to send the email]({})".format(url))
