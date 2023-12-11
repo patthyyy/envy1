@@ -35,12 +35,12 @@ if st.button('Submit'):
     )
     # Show the response from the AI in a box
     st.markdown('**AI response:**')
-    # suggestion_dictionary = response.choices[0].message.content
+    suggestion_dictionary = response.choices[0].message.content
 
 
-    # sd = json.loads(suggestion_dictionary)
+    sd = json.loads(suggestion_dictionary)
 
-    # print (sd)
-    # suggestion_df = pd.DataFrame.from_dict(sd)
-    # print(suggestion_df)
-    # st.table(suggestion_df)
+    print (sd)
+    suggestion_df = pd.DataFrame.from_dict(sd)
+    print(suggestion_df)
+    st.table(suggestion_df)
