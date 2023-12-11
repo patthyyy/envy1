@@ -3,7 +3,7 @@ from langchain.llms import OpenAI
 
 st.title('🦜🔗 Quickstart App')
 
-openai_api_key = st.sidebar.text_input('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')
+openai_api_key = st.sidebar.text_input('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')
 
 def generate_response(input_text):
   llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
