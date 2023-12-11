@@ -8,13 +8,14 @@ import pandas as pd
 user_api_key = st.sidebar.text_input("OpenAI API key", type="password")
 
 client = openai.OpenAI(api_key=user_api_key)
-prompt = """Imagine yourself as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in a JSON array with one suggestion per line. Each suggestion should include the following fields:
-- "Symptoms"
-- "Recommended Medication"
-- "Medication Class"
-- "Administration Method"
-Wait for the user to initiate the conversation before providing any information."""    
-
+# prompt = """Imagine you as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in text. Each suggestion should include the following fields:
+# - "Symptoms"
+# - "Recommended Medication"
+# - "Medication Class"
+# - "Administration Method"
+# Wait for the user to initiate the conversation before providing any information."""    
+prompt = """Imagine you as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in Recommended Medication
+# Wait for the user to initiate the conversation before providing any information.""" 
 
 st.title('Medicine doctor')
 st.markdown('Input a patient \'s symptoms that you want to treat. \n\
@@ -46,14 +47,9 @@ if st.button('Submit'):
     # st.table(suggestion_df)
      # Extract AI's reply from the response
 # Print the full response for debugging
-    print("Full Response:", response)
-    
-    # Extract AI's reply from the response
-    try:
-        ai_reply = response['choices'][0]['message']['content']
-    except KeyError as e:
-        print(f"Error extracting AI's reply: {e}")
-        ai_reply = "Error extracting AI's reply"
+
+    ai_reply = response['choices'][0]['message']['content']
+
     # Show the response from the AI in a box
     st.markdown('**AI response:**')
     st.write(ai_reply)
