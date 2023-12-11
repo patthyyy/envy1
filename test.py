@@ -45,8 +45,15 @@ if st.button('Submit'):
     # print(suggestion_df)
     # st.table(suggestion_df)
      # Extract AI's reply from the response
-    ai_reply = response['choices'][0]['message']['content']
+# Print the full response for debugging
+    print("Full Response:", response)
     
+    # Extract AI's reply from the response
+    try:
+        ai_reply = response['choices'][0]['message']['content']
+    except KeyError as e:
+        print(f"Error extracting AI's reply: {e}")
+        ai_reply = "Error extracting AI's reply"
     # Show the response from the AI in a box
     st.markdown('**AI response:**')
     st.write(ai_reply)
