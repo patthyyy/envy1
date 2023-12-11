@@ -1,77 +1,18 @@
 import streamlit as st
-import openai
-from ml_backend import ml_backend
+from langchain.llms import OpenAI
 
-class ml_backend:
-        
-    openai.api_key = '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'
+st.title('🦜🔗 Quickstart App')
 
-    def generate_email(self, userPrompt ="Write me a professionally sounding email", start="Dear"):
-        """Returns a generated an email using GPT3 with a certain prompt and starting sentence"""
+openai_api_key = st.sidebar.text_input('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')
 
-        response = openai.Completion.create(
-        engine="davinci",
-        prompt=userPrompt + "\n\n" + start,
-        temperature=0.71,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0.36,
-        presence_penalty=0.75
-        )
-        return response.get("choices")[0]['text']
+def generate_response(input_text):
+  llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
+  st.info(llm(input_text))
 
-    def replace_spaces_with_pluses(self, sample):
-        """Returns a string with each space being replaced with a plus so the email hyperlink can be formatted properly"""
-        changed = list(sample)
-        for i, c in enumerate(changed):
-            if(c == ' ' or c =='  ' or c =='   ' or c=='\n' or c=='\n\n'):
-                changed[i] = '+'
-        return ''.join(changed)
-
-st.title("Interactive Email Generator App")
-st.text("by Alex Zavalny")
-
-st.markdown(""" 
-
-# About
- 
-## Play around with the sliders and text fields to generate your very own emails! 
-## At the end, you can automatically send your email to a recipient via Gmail  
-
-## Business Benefits and Usecases:
-* Time saved writing medium-long sized emails
-* Mental Energy is conserved
-* Anxiety of writing a **professional sounding** email (or email with any writing style) is removed as the GPT3 Language model used is trained from a variety of many different internet sources
-
-""")
-
-st.markdown("# Generate Email")
-
-backend = ml_backend()
-
-with st.form(key="form"):
-    prompt = st.text_input("Describe the Kind of Email you want to be written.")
-    st.text(f"(Example: Write me a professional sounding email to my boss)")
-
-    start = st.text_input("Begin writing the first few or several words of your email:")
-
-    slider = st.slider("How many characters do you want your email to be? ", min_value=64, max_value=750)
-    st.text("(A typical email is usually 100-500 characters)")
-
-    submit_button = st.form_submit_button(label='Generate Email')
-
-    if submit_button:
-        with st.spinner("Generating Email..."):
-            output = backend.generate_email(prompt, start)
-        st.markdown("# Email Output:")
-        st.subheader(start + output)
-
-        st.markdown("____")
-        st.markdown("# Send Your Email")
-        st.subheader("You can press the Generate Email Button again if you're unhappy with the model's output")
-        
-        st.subheader("Otherwise:")
-        st.text(output)
-        url = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=&body=" + backend.replace_spaces_with_pluses(start + output)
-
-        st.markdown("[Click me to send the email]({})".format(url))
+with st.form('my_form'):
+  text = st.text_area('Enter text:', 'What are the three key pieces of advice for learning how to code?')
+  submitted = st.form_submit_button('Submit')
+  if not openai_api_key.startswith('sk-'):
+    st.warning('Please enter your OpenAI API key!', icon='⚠')
+  if submitted and openai_api_key.startswith('sk-'):
+    generate_response(text)
