@@ -1,55 +1,18 @@
-
 import streamlit as st
-import openai
-import json
-import pandas as pd
+from langchain.llms import OpenAI
 
-# Get the API key from the sidebar called OpenAI API key
-user_api_key = st.sidebar.text_input("OpenAI API key", type="password")
+st.title('🦜🔗 Quickstart App')
 
-client = openai.OpenAI(api_key=user_api_key)
-# prompt = """Imagine you as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in text. Each suggestion should include the following fields:
-# - "Symptoms"
-# - "Recommended Medication"
-# - "Medication Class"
-# - "Administration Method"
-# Wait for the user to initiate the conversation before providing any information."""    
-prompt = """Imagine you as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in Recommended Medication
-# Wait for the user to initiate the conversation before providing any information.""" 
+openai_api_key = st.sidebar.text_input('OpenAI API Key')
 
-st.title('Medicine doctor')
-st.markdown('Input a patient \'s symptoms that you want to treat. \n\
-            The AI will give you suggestions on how to treat it.')
+def generate_response(input_text):
+  llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
+  st.info(llm(input_text))
 
-user_input = st.text_area("Enter some symtoms to treat:", "Your text here")
-
-
-# submit button after text input
-if st.button('Submit'):
-    messages_so_far = [
-        {"role": "system", "content": prompt},
-        {'role': 'user', 'content': user_input},
-    ]
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages_so_far
-    )
-    # Show the response from the AI in a box
-    # st.markdown('**AI response:**')
-    # suggestion_dictionary = response.choices[0].message.content
-
-
-    # sd = json.loads(suggestion_dictionary)
-
-    # print (sd)
-    # suggestion_df = pd.DataFrame.from_dict(sd)
-    # print(suggestion_df)
-    # st.table(suggestion_df)
-     # Extract AI's reply from the response
-# Print the full response for debugging
-
-    ai_reply = response['choices'][0]['message']['content']
-
-    # Show the response from the AI in a box
-    st.markdown('**AI response:**')
-    st.write(ai_reply)
+with st.form('my_form'):
+  text = st.text_area('Enter text:', 'What are the three key pieces of advice for learning how to code?')
+  submitted = st.form_submit_button('Submit')
+  if not openai_api_key.startswith('sk-'):
+    st.warning('Please enter your OpenAI API key!', icon='⚠')
+  if submitted and openai_api_key.startswith('sk-'):
+    generate_response(text)
