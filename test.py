@@ -8,23 +8,19 @@ import pandas as pd
 user_api_key = st.sidebar.text_input("OpenAI API key", type="password")
 
 client = openai.OpenAI(api_key=user_api_key)
-prompt = """Act as an AI writing tutor in English. You will receive a 
-            piece of writing and you should give suggestions on how to improve it.
-            List the suggestions in a JSON array, one suggestion per line.
-            Each suggestion should have 3 fields:
-            - "before" - the text before the suggestion
-            - "after" - the text after the suggestion
-            - "category" - the category of the suggestion one of "grammar", "style", "word choice", "other"
-            - "comment" - a comment about the suggestion
-            Don't say anything at first. Wait for the user to say something.
-        """    
+prompt = """Imagine yourself as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in a JSON array with one suggestion per line. Each suggestion should include the following fields:
+- "Symptoms"
+- "Recommended Medication"
+- "Medication Class"
+- "Administration Method"
+Wait for the user to initiate the conversation before providing any information."""    
 
 
 st.title('Writing tutor')
-st.markdown('Input the writing that you want to improve. \n\
-            The AI will give you suggestions on how to improve it.')
+st.markdown('Input a patient \'s symptoms that you want to treat. \n\
+            The AI will give you suggestions on how to treat it.')
 
-user_input = st.text_area("Enter some text to correct:", "Your text here")
+user_input = st.text_area("Enter some symtoms to treat:", "Your text here")
 
 
 # submit button after text input
