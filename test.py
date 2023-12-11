@@ -1,27 +1,44 @@
-import openai 
 import streamlit as st
-with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
-    "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+import openai
 
-st.title("💬 Chatbot") 
-if "messages" not in st.session_state:
-  st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+# ใส่ API key ของคุณที่ได้จาก OpenAI
+openai.api_key = "YOUR_OPENAI_API_KEY"
 
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+# ข้อความเริ่มต้นที่จะให้กับผู้ใช้
+prompt = """Imagine yourself as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in a JSON array with one suggestion per line. Each suggestion should include the following fields:
+- "Symptoms"
+- "Recommended Medication"
+- "Medication Class"
+- "Administration Method"
+Wait for the user to initiate the conversation before providing any information."""
 
-if prompt := st.chat_input():
-    if not openai_api_key:
-        st.info("Please add your OpenAI API key to continue.")
-        st.stop()
+# สร้างหน้าต่าง Streamlit
+st.title('Medicine Doctor')
+st.markdown('Input a patient\'s symptoms that you want to treat. \n\
+            The AI will give you suggestions on how to treat it.')
 
-    openai.api_key = openai_api_key
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
-    msg = response.choices[0].message
-    st.session_state.messages.append(msg)
-    st.chat_message("assistant").write(msg.content)
+# กล่องใส่ข้อความของผู้ใช้
+user_input = st.text_area("Enter some symptoms to treat:", "Your text here")
+
+# ปุ่ม Submit
+if st.button('Submit'):
+    # สร้างโครงสร้างข้อความสำหรับ OpenAI API
+    messages = [
+        {"role": "system", "content": prompt},
+        {'role': 'user', 'content': user_input},
+    ]
+
+    # ใช้ OpenAI API เพื่อรับการตอบกลับ
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0.7,
+        max_tokens=150
+    )
+
+    # นำข้อความตอบกลับจาก OpenAI
+    ai_reply = response['choices'][0]['message']['content']
+
+    # แสดงผลลัพธ์จาก OpenAI
+    st.markdown('**AI Response:**')
+    st.write(ai_reply)
