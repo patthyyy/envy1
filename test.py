@@ -1,18 +1,27 @@
+import openai 
 import streamlit as st
-from langchain.llms import OpenAI
+with st.sidebar:
+    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
+    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
+    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
+    "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
 
-st.title('🦜🔗 Quickstart App')
+st.title("💬 Chatbot") 
+if "messages" not in st.session_state:
+  st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
-openai_api_key = st.sidebar.text_input('OpenAI API Key')
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
 
-def generate_response(input_text):
-  llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
-  st.info(llm(input_text))
+if prompt := st.chat_input():
+    if not openai_api_key:
+        st.info("Please add your OpenAI API key to continue.")
+        st.stop()
 
-with st.form('my_form'):
-  text = st.text_area('Enter text:', 'What are the three key pieces of advice for learning how to code?')
-  submitted = st.form_submit_button('Submit')
-  if not openai_api_key.startswith('sk-'):
-    st.warning('Please enter your OpenAI API key!', icon='⚠')
-  if submitted and openai_api_key.startswith('sk-'):
-    generate_response(text)
+    openai.api_key = openai_api_key
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
+    msg = response.choices[0].message
+    st.session_state.messages.append(msg)
+    st.chat_message("assistant").write(msg.content)
