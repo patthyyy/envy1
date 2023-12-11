@@ -16,7 +16,7 @@ prompt = """Imagine yourself as a pharmacist. You will receive a patient's sympt
 Wait for the user to initiate the conversation before providing any information."""    
 
 
-st.title('Writing tutor')
+st.title('Medicine doctor')
 st.markdown('Input a patient \'s symptoms that you want to treat. \n\
             The AI will give you suggestions on how to treat it.')
 
