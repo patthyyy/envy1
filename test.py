@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 # ใส่ API key ของคุณที่ได้จาก OpenAI
-openai.api_key = "YOUR_OPENAI_API_KEY"
+openai.api_key = "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"
 
 # ข้อความเริ่มต้นที่จะให้กับผู้ใช้
 prompt = """Imagine yourself as a pharmacist. You will receive a patient's symptoms and recommend medications. Provide suggestions in a JSON array with one suggestion per line. Each suggestion should include the following fields:
