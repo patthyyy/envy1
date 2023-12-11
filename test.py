@@ -1,38 +1,28 @@
 import streamlit as st
-from langchain import OpenAI
-from langchain.docstore.document import Document
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains.summarize import load_summarize_chain
+import openai
 
-def generate_response(txt):
-    # Instantiate the LLM model
-    llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
-    # Split text
-    text_splitter = CharacterTextSplitter()
-    texts = text_splitter.split_text(txt)
-    # Create multiple documents
-    docs = [Document(page_content=t) for t in texts]
-    # Text summarization
-    chain = load_summarize_chain(llm, chain_type='map_reduce')
-    return chain.run(docs)
+# Set your OpenAI API key
+openai.api_key = "YOUR_OPENAI_API_KEY"
 
-# Page title
-st.set_page_config(page_title='🦜🔗 Text Summarization App')
-st.title('🦜🔗 Text Summarization App')
+# Streamlit app title and description
+st.title("Chatbot with OpenAI GPT-3.5 Turbo")
+st.write("Ask a question and the chatbot will provide an answer!")
 
-# Text input
-txt_input = st.text_area('Enter your text', '', height=200)
+# User input box
+user_input = st.text_input("Ask a question:")
 
-# Form to accept user's text input for summarization
-result = []
-with st.form('summarize_form', clear_on_submit=True):
-    openai_api_key = st.text_input('OpenAI API Key', type = 'password', disabled=not txt_input)
-    submitted = st.form_submit_button('Submit')
-    if submitted and openai_api_key.startswith('sk-'):
-        with st.spinner('Calculating...'):
-            response = generate_response(txt_input)
-            result.append(response)
-            del openai_api_key
+# Button to generate response
+if st.button("Get Answer"):
+    # Create a prompt for the OpenAI API
+    prompt = f"Question: {user_input}\nAnswer:"
 
-if len(result):
-    st.info(response)
+    # Call the OpenAI API
+    response = openai.Completion.create(
+        engine="text-davinci-003",  # You can also use "gpt-3.5-turbo"
+        prompt=prompt,
+        max_tokens=150
+    )
+
+    # Extract and display the AI's response
+    ai_answer = response.choices[0].text.strip()
+    st.write("AI Answer:", ai_answer)
