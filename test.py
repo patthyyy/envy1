@@ -35,7 +35,7 @@ if st.button('Submit'):
     )
     # Show the response from the AI in a box
     st.markdown('**AI response:**')
-    st.text('response')
+    st.text(response)
     # suggestion_dictionary = response.choices[0].message.content
 
 
